@@ -1,0 +1,32 @@
+{
+  "name": "hero",
+  "version": "1.0.0",
+  "description": "Smart Bot UJCM",
+  "main": "app.js",
+  "scripts": {
+    "test": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@sendgrid/mail": "^6.3.1",
+    "apiai": "^2.0.5",
+    "axios": "^0.18.0",
+    "body-parser": "^1.15.1",
+    "ejs": "^2.6.1",
+    "express": "^4.13.4",
+    "express-session": "^1.15.6",
+    "moment": "^2.22.2",
+    "newrelic": "^4.8.0",
+    "passport": "^0.4.0",
+    "passport-facebook": "^2.1.1",
+    "pg": "7.4.3",
+    "request": "^2.72.0",
+    "sendgrid": "^4.2.0",
+    "uuid": "^2.0.3"
+  }
+}

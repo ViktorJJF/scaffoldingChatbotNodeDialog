@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <% include partials/head %>
+</head>
+
+<body>
+    <header>
+        <% include partials/header %>
+    </header>
+
+    <!--Esto es el insert para los procedimientos-->
+
+
+    <div class="container">
+        <h2>Insertar Nuevos Procedimientos Administrativos 2018</h2>
+        <form class="form-horizontal" action="/dashboard" method="POST" name="myForm">
+            <div class="form-group">
+                <label class="control-label col-sm-2" for="email">Nombre:</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="pwd" placeholder="Nombre del procedimiento" name="nombre">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-2" for="pwd">Objetivo:</label>
+                <div class="col-sm-10">
+                    <input type="tex" class="form-control" id="objetivo" placeholder="Ingresa objetivo" name="objetivo">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-2" for="pwd">Responsabilidad:</label>
+                <div class="col-sm-10">
+                    <textarea class="form-control" rows="4" placeholder="Responsabilidad!" required name="responsabilidad"></textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-2" for="pwd">Requisitos:</label>
+                <div class="col-sm-10">
+                    <textarea class="form-control" rows="6" placeholder="Requisitos!" required name="requisito"></textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-2" for="pwd">Duración:</label>
+                <div class="col-sm-10">
+                    <input type="tex" class="form-control" id="pwd" placeholder="Ingresa la duración" name="duracion">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-2" for="pwd">Costo:</label>
+                <div class="col-sm-10">
+                    <input type="tex" class="form-control" id="pwd" placeholder="Ingresa el costo" name="costo">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-2" for="pwd">Tipo de Trámite:</label>
+                <div class="col-sm-10">
+                    <input type="tex" class="form-control" id="pwd" placeholder="Ingresa el número del tipo de trámite" name="tipo_oficina_tramite" value="<%= listadoRequisitos.tipo_oficina_tramite %>">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <button type="submit" class="btn btn-default" onclick="submitForm()">Insertar</button>
+                </div>
+            </div>
+
+
+        </form>
+    </div>
+
+    <!--Esto es el listado de los procedimientos administrativos-->
+    <div class="container">
+        <h1>Listado de Procedimientos Administrativos Pregrado 2018</h1>
+        <ul class="list-group">
+            <% listadoRequisitos.forEach(function(listadoRequisitos) { %>
+
+                <div class="container">
+                    <h5>Actualizar
+                        <%= listadoRequisitos.nombre %>
+                    </h5>
+                    <h5>ID:
+                        <%= listadoRequisitos.id_procedimiento_ad_pre %>
+                    </h5>
+
+                    <form class="form-horizontal" action="/save" method="POST" name="myForm">
+                        <div class="form-group">
+                            <input type="hidden" class="form-control" name="id" id="id" value="<%= listadoRequisitos.id_procedimiento_ad_pre %>">
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-2" for="email">Nombre:</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="nombre" placeholder="Nombre del procedimiento" name="nombre" value="<%= listadoRequisitos.nombre %>">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-2" for="pwd">Objetivo:</label>
+                            <div class="col-sm-10">
+                                <input type="tex" class="form-control" id="objetivo" placeholder="Ingresa objetivo" name="objetivo" value="<%= listadoRequisitos.objetivo %>">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-2" for="pwd">Responsabilidad:</label>
+                            <div class="col-sm-10">
+                                <textarea class="form-control" rows="4" placeholder="Responsabilidad!" required name="responsabilidad" value="<%= listadoRequisitos.responsabilidad %>"><%=listadoRequisitos.responsabilidad %></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-2" for="pwd">Requisitos:</label>
+                            <div class="col-sm-10">
+                                <textarea class="form-control" rows="6" placeholder="Requisitos!" required name="requisito" value="<%= listadoRequisitos.requisito %>"><%=listadoRequisitos.requisito %></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-2" for="pwd">Duración:</label>
+                            <div class="col-sm-10">
+                                <input type="tex" class="form-control" id="pwd" placeholder="Ingresa la duración" name="duracion" value="<%= listadoRequisitos.duracion %>">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-2" for="pwd">Costo:</label>
+                            <div class="col-sm-10">
+                                <input type="tex" class="form-control" id="pwd" placeholder="Ingresa el costo" name="costo" value="<%= listadoRequisitos.costo %>">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-2" for="pwd">Tipo de Trámite:</label>
+                            <div class="col-sm-10">
+                                <input type="tex" class="form-control" id="pwd" placeholder="Ingresa el número del tipo de trámite" name="tipo_oficina_tramite" value="<%= listadoRequisitos.tipo_oficina_tramite %>">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <button type="submit" class="btn btn-default" onclick="submitForm()">Actualizar</button>
+                            </div>
+                        </div>
+
+
+                    </form>
+                </div>
+
+        </ul>
+        <% }) %>
+    </div>
+
+
+    <footer>
+        <% include partials/footer %>
+    </footer>
+
+    <!--Limpiar campos luego de submitting-->
+
+</body>
+
+</html>

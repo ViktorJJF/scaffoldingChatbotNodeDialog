@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <title>Viktor-UJCM</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-rc.2/css/materialize.min.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+
+</head>
+
+<body>
+    <div class="container" id="registration-form">
+
+        <div class="frm" class="card-panel lime yellow lighten-1">
+            <div>
+                <h5 class="card-panel lime yellow lighten-1">Suscripción Viktor UJCM</h5>
+            </div>
+
+
+
+            <form action="/webviews/save" method="GET" name="myForm">
+                <input type="hidden" name="psid" id="psid">
+                <div class="form-group">
+                    <div class="col s12">
+                        <h6>¿Actualmente eres estudiante de la UJCM Filial Tacna?</h6>
+                    </div>
+                    <div class="col s6"><label><input type="radio" class="studentujcm"  id="studentujcm_1" name="studentujcm" value="1" checked><span>Sí</span></label></div>
+                    <div class="col s6"><label><input type="radio" class="studentujcm" id="studentujcm_0" name="studentujcm" value="0"><span>No</span></label></div>
+                </div>
+
+
+                <div class="form-group">
+                    <div class="col s12">
+                        <h6>¿Quieres que te informe de los eventos en la UJCM Filial Tacna?</h6>
+                    </div>
+                    <div class="col s6"><label><input type="radio" class="broadcast"  id="broadcast_1" name="broadcast" value="1" checked><span>Sí</span></label></div>
+                    <div class="col s6"><label><input type="radio" class="broadcast" id="broadcast_0" name="broadcast" value="0"><span>No</span></label></div>
+                </div>
+
+
+
+                <div class="form-group" class="btn waves-effect waves light">
+                    <button id="submitButton" type="submit" value="submit" class="btn btn-success btn-lg"> <i class="">Enviar</i></button>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+    <footer>
+        <% include partials/footer %>
+    </footer>
+
+    <!--Limpiar campos luego de submitting-->
+    <script type="text/javascript">
+        //webview
+
+        (function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) {
+                return;
+            }
+            js = d.createElement(s);
+            js.id = id;
+            js.src = "//connect.facebook.net/en_US/messenger.Extensions.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'Messenger'));
+
+        //Cuando ya cargo el webview
+        window.extAsyncInit = function() {
+            MessengerExtensions.getContext('500259897078868',
+                function success(thread_context) {
+                    $('#psid').val(thread_context.psid);
+                    $.getJSON('/webviews/settings?psid=' + thread_context.psid, function(data) {
+                        console.log('Ha llego esto :V :', data);
+                        $('#studentujcm_' + data.is_student).prop('checked', true);
+                        $('#broadcast_' + data.newsletter).prop('checked', true);
+
+
+                    });
+                },
+                function error(err) {
+                    // error
+                }
+            );
+            $('#submitButton').click(function() {
+                MessengerExtensions.requestCloseBrowser(function success() {
+                    // webview closed
+                }, function error(err) {
+                    // an error occurred
+                });
+            });
+        };
+    </script>
+</body>
+
+</html>
