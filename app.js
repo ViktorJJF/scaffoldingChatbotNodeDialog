@@ -9,7 +9,6 @@ const pg = require('pg');
 const app = express();
 const uuid = require('uuid');
 const userService = require('./database/user');
-const requisitos = require('./database/requisitosTramites');
 const passport = require('passport');
 const FacebookStrategy = require('passport-facebook').Strategy;
 const session = require('express-session');
