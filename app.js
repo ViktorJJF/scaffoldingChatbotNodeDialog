@@ -37,15 +37,15 @@ if (!config.FB_APP_SECRET) {
 if (!config.SERVER_URL) { //used for ink to static files
     throw new Error('missing SERVER_URL');
 }
-if (!config.SENDGRID_API_KEY) { //used for sending email
-    throw new Error('missing SENDGRID_API_KEY');
-}
-if (!config.EMAIL_FROM) { //used for sending email
-    throw new Error('missing EMAIL_FROML');
-}
-if (!config.EMAIL_TO) { //used for sending email
-    throw new Error('missing EMAIL_TO');
-}
+// if (!config.SENDGRID_API_KEY) { //used for sending email
+//     throw new Error('missing SENDGRID_API_KEY');
+// }
+// if (!config.EMAIL_FROM) { //used for sending email
+//     throw new Error('missing EMAIL_FROML');
+// }
+// if (!config.EMAIL_TO) { //used for sending email
+//     throw new Error('missing EMAIL_TO');
+// }
 if (!config.PG_CONFIG) { //postgresql config object
     throw new Error('missing PG_CONFIG');
 }
