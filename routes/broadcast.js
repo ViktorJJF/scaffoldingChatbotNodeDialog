@@ -22,7 +22,18 @@ router.post('/', function(req, res) {
 router.get('/dashboard', function(req, res) {
     requisitos.listadoTramites(function(listadoRequisitos) {
         req.session.listadoRequisitos = listadoRequisitos;
-        res.render('dashboard', { listadoRequisitos: listadoRequisitos });
+        res.render('dashboard', {
+            listadoRequisitos: listadoRequisitos
+        });
+    });
+
+});
+router.get('/api/tramites', function(req, res) {
+    requisitos.listadoTramites(function(listadoRequisitos) {
+        req.session.listadoRequisitos = listadoRequisitos;
+        res.render('dashboard', {
+            listadoRequisitos: listadoRequisitos
+        });
     });
 
 });
@@ -30,9 +41,7 @@ router.get('/dashboard', function(req, res) {
 router.get('/datos', function(req, res) {
 
     requisitos.listadoTramites(function(listadoRequisitos) {
-        let datos = [];
-        datos = listadoRequisitos;
-        res.json(datos);
+        res.json(listadoRequisitos);
     });
 
 
@@ -40,7 +49,9 @@ router.get('/datos', function(req, res) {
 router.post('/save', function(req, res) {
 
     requisitos.actualizarTramitesPre((callback) => {
-        res.json({ DataActualizada: req.body });
+        res.json({
+            DataActualizada: req.body
+        });
     }, req.body);
 
 
@@ -57,7 +68,9 @@ router.post('/dashboard', function(req, res) {
     datosProcedimiento[5] = req.body.costo;
     datosProcedimiento[6] = req.body.tipo_oficina_tramite;
     requisitos.insertarTramitesPre((callback) => {
-        res.json({ DataInsertada: req.body });
+        res.json({
+            DataInsertada: req.body
+        });
     }, datosProcedimiento);
 
 });
@@ -77,7 +90,12 @@ router.post('/broadcast', function(req, res) {
     req.session.message = message;
     userService.readAllUsers(function(users) {
         req.session.users = users;
-        res.render('broadcast-confirm', { user: req.user, message: message, users: users, numUsers: users.length })
+        res.render('broadcast-confirm', {
+            user: req.user,
+            message: message,
+            users: users,
+            numUsers: users.length
+        })
     });
 
 
@@ -105,7 +123,12 @@ router.get('/broadcast-sent', function(req, res) {
     req.session.message = null;
     req.session.users = null;
     //res.render('/broadcast-sent');
-    res.render('broadcast-sent', { message: message, users: users, numUsers: users.length, newstype: newstype });
+    res.render('broadcast-sent', {
+        message: message,
+        users: users,
+        numUsers: users.length,
+        newstype: newstype
+    });
 });
 
 router.get('/logout', function(req, res) {

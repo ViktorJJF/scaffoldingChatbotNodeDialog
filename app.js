@@ -9,14 +9,12 @@ const pg = require('pg');
 const app = express();
 const uuid = require('uuid');
 const userService = require('./user');
-const colors = require('./colors');
 const requisitos = require('./requisitosTramites');
 const passport = require('passport');
 const FacebookStrategy = require('passport-facebook').Strategy;
 const session = require('express-session');
 const broadcast = require('./routes/broadcast');
 const webviews = require('./routes/webviews');
-const levenshtain = require('./Algorithms/Levenshtein');
 
 
 pg.defaults.ssl = true;
@@ -116,7 +114,7 @@ app.use('/', broadcast);
 app.use('/webviews', webviews);
 // Index route
 app.get('/', function(req, res) {
-    res.send('Hola! este espacio será la futura Pagina Web de Mariateguino UJCM')
+    res.send('Hola! este espacio será para el dashboard del chatbot')
 });
 
 
@@ -152,9 +150,6 @@ app.get('/webhook/', function(req, res) {
 app.post('/webhook/', function(req, res) {
     var data = req.body;
     console.log(JSON.stringify(data));
-
-
-
     // Make sure this is a page subscription
     if (data.object == 'page') {
         // Iterate over each entry
@@ -295,369 +290,23 @@ function handleEcho(messageId, appId, metadata) {
 }
 
 function handleApiAiAction(sender, action, responseText, contexts, parameters) {
-    console.log('Se entro a handleApiAiAction:');
-    switch (action) {
-        //Futura implementacion broadcast cuando se apruebe el bot
-        // case "unsubscribe":
-        // userService.newsletterSettings(function(updated){
-        // 	if(updated){
-        // 		sendTextMessage(sender,"Ya no estas suscrito, puedes activar esta opcion despues");
+    //gestor de las acciones (si las hubiera) en el intent que fue emparejado por dialogflow
+    //las acciones sirven de eventos que se activan al momento que un intent fue emparejado
+    // default:
+    // //unhandled action, just send back the text
+    //     console.log('Se activo sendTextMessage case default de handleAction');
+    // sendTextMessage(sender, responseText);
 
-        // 	} else {
-        // 		sendTextMessage(sender,"De momento el servicio esta inhabilitado, intenta mas tarde 😓");
-
-        // 	}
-        // },0,sender);
-
-        // break;
-        case "bot-clima":
-            const weather = require('./bot-clima/bot-clima');
-
-            weather.getWeather(responseText)
-                .then(clima => {
-                    sendTextMessage(sender, `El clima en ${responseText} es ${clima}℃`);
-                    (sendTextMessage(sender, `Créditos a OpenWeatherMap 🤗 sabe todo del clima`));
-
-                })
-                .catch(() => {
-                    sendTextMessage(sender, 'No encontre el clima para esa ubicacion');
-                });
-
-            break;
-        case "req-tramites":
-            let maxPercentWord;
-            levenshtain.applyLevenshtein(responseText, (res) => {
-                maxPercentWord = res;
-            });
-            if (!isDefined(contexts[0]) || contexts[0].name != 'req-tramites_dialog_params_requisitos') {
-                console.log(`Palabra mandada: ${responseText}`);
-                requisitos.leerTramitesPre((requisitos) => {
-                    if (requisitos == 'INDEFINIDO') {
-                        sendTextMessage(sender, 'No encontré información sobre ese trámite 🤐 capaz no escribiste su nombre correctamente'); //Por si no se encontro en la BD			
-                    } else {
-                        if (maxPercentWord == 'Grado de Bachiller') {
-                            var msgBach;
-                            msgBach = 'parece que quieres tramitar tu grado de bachiller, \n¿ingresaste a la UJCM antes de julio del 2014?';
-                            let replies_bachiller = [{
-                                    "content_type": "text",
-                                    "title": "Sí, ingresé antes",
-                                    "payload": "si_bachiller"
-                                },
-                                {
-                                    "content_type": "text",
-                                    "title": "No, ingresé después",
-                                    "payload": "no_bachiller"
-                                }
-
-                            ];
-                            return setTimeout(() => sendQuickReply(sender, msgBach, replies_bachiller), 1500);
-                        }
-                        let requisito = requisitos;
-                        let reply = [];
-                        reply[0] = 'Estos son los requisitos que encontré para ' + maxPercentWord + ' 😉 \n' + requisito[0].requisito;
-                        reply[0] = reply[0].replace(/\\n/g, '\n');
-                        reply[1] = 'recuerda también que ya puedes hacer tus trámites en línea 😀';
-
-                        // reply[1] = 'El costo para este trámite es: ' + requisito[0].costo;
-                        // reply[2] = 'Tambien puedes ver el manual de procedimientos ' +
-                        //    '😀 https://drive.google.com/file/d/18RHP8zLFeKi1T2q-dWYFunv72mAI0RHw/view?usp=sharing';
-
-                        sendTextMessage(sender, reply[0]);
-                        setTimeout(() => sendTextMessage(sender, reply[1]), 500);
-                        switch (requisito[0].tipo_oficina_tramite) {
-                            case 0: // Tramites que no figuran en el sistema Tramite en linea
-                                reply[2] = `Este trámite lo tienes que hacer personalmente 😅`;
-                                setTimeout(() => sendTextMessage(sender, reply[2]), 1000);
-                                break;
-                            case 1: // Tramites Escuela
-                                reply[2] = `¿Quieres hacer este trámite ahora?`;
-                                let replies_escuela = [{
-                                        "content_type": "text",
-                                        "title": "Sí",
-                                        "payload": "si_tramite_escuela"
-                                    },
-                                    {
-                                        "content_type": "text",
-                                        "title": "No",
-                                        "payload": "no_tramite"
-                                    }
-
-                                ];
-                                setTimeout(() => sendQuickReply(sender, reply[2], replies_escuela), 1500);
-                                break;
-                            case 2: // Tramites Economia 
-                                reply[2] = `¿Quieres hacer este trámite ahora?`;
-                                let replies_economia = [{
-                                        "content_type": "text",
-                                        "title": "Sí",
-                                        "payload": "si_tramite_economia"
-                                    },
-                                    {
-                                        "content_type": "text",
-                                        "title": "No",
-                                        "payload": "no_tramite"
-                                    }
-
-                                ];
-                                setTimeout(() => sendQuickReply(sender, reply[2], replies_economia), 1500);
-                                break;
-                            case 3: // Tramites servicios academicos
-                                reply[2] = `¿Quieres hacer este trámite ahora?`;
-                                let replies_servicios_academicos = [{
-                                        "content_type": "text",
-                                        "title": "Sí",
-                                        "payload": "si_tramite_servicio_academico"
-                                    },
-                                    {
-                                        "content_type": "text",
-                                        "title": "No",
-                                        "payload": "no_tramite"
-                                    }
-
-                                ];
-                                setTimeout(() => sendQuickReply(sender, reply[2], replies_servicios_academicos), 1500);
-                                break;
-                            case 4: // Tramites bienestar
-                                reply[2] = `¿Quieres hacer este trámite ahora?`;
-                                let replies_bienestar = [{
-                                        "content_type": "text",
-                                        "title": "Sí",
-                                        "payload": "si_tramite_bienestar"
-                                    },
-                                    {
-                                        "content_type": "text",
-                                        "title": "No",
-                                        "payload": "no_tramite"
-                                    }
-
-                                ];
-                                setTimeout(() => sendQuickReply(sender, reply[2], replies_bienestar), 1500);
-                                break;
-                        }
-
-
-                    }
-
-                }, maxPercentWord)
-
-            } else {
-                sendTextMessage(sender, responseText); //Para que pida requisitos
-            }
-            break;
-        case "req-tramites-with-entity": // Without Levenshtain
-            if (!isDefined(contexts[0]) || contexts[0].name != 'req-tramites-with-entity_dialog_params_requisitos') {
-                console.log(`Palabra mandada: ${responseText}`);
-                requisitos.leerTramitesPre(function(requisitos) {
-                    if (requisitos == 'INDEFINIDO') {
-                        sendTextMessage(sender, 'Ups, no encontré información sobre ese trámite 🤐 capaz no escribiste su nombre correctamente'); //Por si no se encontro en la BD			
-                    } else {
-                        if (responseText == 'Grado de Bachiller') {
-                            var msgBach;
-                            msgBach = 'parece que quieres tramitar tu grado de bachiller, \n¿ingresaste a la UJCM antes de marzo del 2014?';
-                            let replies_bachiller = [{
-                                    "content_type": "text",
-                                    "title": "Sí, ingresé antes",
-                                    "payload": "si_bachiller"
-                                },
-                                {
-                                    "content_type": "text",
-                                    "title": "No, ingresé después",
-                                    "payload": "no_bachiller"
-                                }
-
-                            ];
-                            return setTimeout(() => sendQuickReply(sender, msgBach, replies_bachiller), 1500);
-                        }
-                        let requisito = requisitos;
-                        let reply = [];
-                        reply[0] = 'Estos son los requisitos que encontré para ' + responseText + ' 😉 \n' + requisito[0].requisito;
-                        reply[0] = reply[0].replace(/\\n/g, '\n');
-                        reply[1] = 'recuerda también que ya puedes hacer tus trámites en línea 😀';
-                        sendTextMessage(sender, reply[0]);
-                        setTimeout(() => sendTextMessage(sender, reply[1]), 500);
-                        switch (requisito[0].tipo_oficina_tramite) {
-                            case 0: // Tramites que no figuran en el sistema Tramite en linea
-                                reply[2] = `Este trámite lo tienes que hacer personalmente 😅`;
-                                setTimeout(() => sendTextMessage(sender, reply[2]), 1000);
-                                break;
-                            case 1: // Tramites Escuela
-                                reply[2] = `¿Quieres hacer este trámite ahora?`;
-                                let replies_escuela = [{
-                                        "content_type": "text",
-                                        "title": "Sí",
-                                        "payload": "si_tramite_escuela"
-                                    },
-                                    {
-                                        "content_type": "text",
-                                        "title": "No",
-                                        "payload": "no_tramite"
-                                    }
-
-                                ];
-                                setTimeout(() => sendQuickReply(sender, reply[2], replies_escuela), 1500);
-                                break;
-                            case 2: // Tramites Economia 
-                                reply[2] = `¿Quieres hacer este trámite ahora?`;
-                                let replies_economia = [{
-                                        "content_type": "text",
-                                        "title": "Sí",
-                                        "payload": "si_tramite_economia"
-                                    },
-                                    {
-                                        "content_type": "text",
-                                        "title": "No",
-                                        "payload": "no_tramite"
-                                    }
-
-                                ];
-                                setTimeout(() => sendQuickReply(sender, reply[2], replies_economia), 1500);
-                                break;
-                            case 3: // Tramites servicios academicos
-                                reply[2] = `¿Quieres hacer este trámite ahora?`;
-                                let replies_servicios_academicos = [{
-                                        "content_type": "text",
-                                        "title": "Sí",
-                                        "payload": "si_tramite_servicio_academico"
-                                    },
-                                    {
-                                        "content_type": "text",
-                                        "title": "No",
-                                        "payload": "no_tramite"
-                                    }
-
-                                ];
-                                setTimeout(() => sendQuickReply(sender, reply[2], replies_servicios_academicos), 1500);
-                                break;
-                            case 4: // Tramites bienestar
-                                reply[2] = `¿Quieres hacer este trámite ahora?`;
-                                let replies_bienestar = [{
-                                        "content_type": "text",
-                                        "title": "Sí",
-                                        "payload": "si_tramite_bienestar"
-                                    },
-                                    {
-                                        "content_type": "text",
-                                        "title": "No",
-                                        "payload": "no_tramite"
-                                    }
-
-                                ];
-                                setTimeout(() => sendQuickReply(sender, reply[2], replies_bienestar), 1500);
-                                break;
-                        }
-                    }
-
-                }, responseText)
-
-            } else {
-                sendTextMessage(sender, responseText); //Para que pida requisitos
-            }
-            break;
-            // case "iphone_colors":
-            // 	colors.readAllColors(function(allColors){
-            // 		let allColorsString=allColors.join(', ');
-            // 		let reply=`Iphone 8 is avaliable in ${allColorsString} . What is your favorite color?`;
-            // 		sendTextMessage(sender,reply);
-            // 	})
-
-            // break;
-
-        case "detailed-application":
-            console.log('Tu nombre es : ', contexts[0].parameters['user-name']);
-            console.log('Tu celular es : ', contexts[0].parameters['phone-dash-number']);
-            console.log('Tu puesto es : ', contexts[0].parameters['job-vacancy']);
-            console.log(isDefined(contexts[0]));
-            console.log('El contexto es:', contexts[0].name);
-            console.log(contexts[0].parameter);
-            //sendEmail('Hola! estoy probando sengrid','Que tal :V');
-            if (isDefined(contexts[0]) &&
-                (contexts[0].name == 'job_aplication' || contexts[0].name == 'job-application-details_dialog_context')) {
-                let phone_number = (isDefined(contexts[0].parameters['phone-dash-number']) &&
-                    contexts[0].parameters['phone-dash-number'] != '') ? contexts[0].parameters['phone-dash-number'] : '';
-                console.log('phone_number = ', phone_number);
-                let user_name = (isDefined(contexts[0].parameters['user-name']) &&
-                    contexts[0].parameters['user-name'] != '') ? contexts[0].parameters['user-name'] : '';
-                console.log('user_name = ', user_name);
-                let previous_job = (isDefined(contexts[0].parameters['previus-job']) &&
-                    contexts[0].parameters['previus-job'] != '') ? contexts[0].parameters['previus-job'] : '';
-                console.log('previous_job = ', previous_job);
-                let years_of_experience = (isDefined(contexts[0].parameters['years-of-experience']) &&
-                    contexts[0].parameters['years-of-experience'] != '') ? contexts[0].parameters['years-of-experience'] : '';
-                console.log('years_of_experience = ', years_of_experience);
-                let job_vacancy = (isDefined(contexts[0].parameters['job-vacancy']) &&
-                    contexts[0].parameters['job-vacancy'] != '') ? contexts[0].parameters['job-vacancy'] : '';
-                console.log('job_vacancy = ', job_vacancy);
-
-                if (phone_number == '' && user_name != '' && previous_job != '' && years_of_experience == '') {
-                    let replies = [{
-                            "content_type": "text",
-                            "title": "Less than 1 year",
-                            "payload": "Less than 1 year"
-                        },
-                        {
-                            "content_type": "text",
-                            "title": "Less than 10 years ",
-                            "payload": "Less than 10 years"
-                        },
-                        {
-                            "content_type": "text",
-                            "title": "More than 10 years",
-                            "payload": "More than 10 years"
-                        }
-
-                    ];
-                    sendQuickReply(sender, responseText, replies);
-
-                } else if (phone_number != '' && user_name != '' && previous_job != '' && years_of_experience != '' && job_vacancy != '') {
-                    let emailContent = 'A new job enquiery from ' + user_name + ' for the job: ' + job_vacancy +
-                        '<br> Previous job position: ' + previous_job + '.' +
-                        '<br> Years of experience:' + years_of_experience + '.' +
-                        '<br> Phone number: ' + phone_number + '.';
-                    console.log('Esto funciona de maravilla!2');
-                    sendEmail('New Job application (testeando)', emailContent);
-                    sendTextMessage(sender, responseText);
-                } else {
-                    sendTextMessage(sender, responseText);
-                }
-            }
-
-            break;
-        case "job-enquiry":
-            let replies = [{
-                    "content_type": "text",
-                    "title": "Accountant",
-                    "payload": "Accountant"
-                },
-                {
-                    "content_type": "text",
-                    "title": "Sales",
-                    "payload": "Sales"
-                },
-                {
-                    "content_type": "text",
-                    "title": "Not interested",
-                    "payload": "Not interested"
-                }
-
-            ];
-
-            sendQuickReply(sender, responseText, replies);
-            break;
-        default:
-            //unhandled action, just send back the text
-            console.log('Se activo sendTextMessage case default de handleAction');
-            sendTextMessage(sender, responseText);
-    }
 }
 
 function handleMessage(message, sender) {
     switch (message.type) {
         case 0: //text
-            console.log('se entro a handleMessage case 0');
+            // se envia mensajes de texto al usuario
             sendTextMessage(sender, message.speech);
             break;
         case 2: //quick replies
-            console.log('se entro a handleMessage case 2');
+            // se envia respuestas rapidas al usuario (opciones como si o no)
             let replies = [];
             for (var b = 0; b < message.replies.length; b++) {
                 let reply = {
@@ -667,18 +316,15 @@ function handleMessage(message, sender) {
                 }
                 replies.push(reply);
             }
-            console.log('Enviar al usuario titulo quick reply: ', message.title);
-            console.log('Enviar al usuario replies: ', replies);
             sendQuickReply(sender, message.title, replies);
             break;
         case 3: //image
-            console.log('se entro a handleMessage case 3');
-            console.log('Enviando imagen con url: ', message.imageUrl);
+            //se envia una imagen al usuario
             sendImageMessage(sender, message.imageUrl);
             break;
         case 4:
             // custom payload
-            console.log('se entro a handleMessage case 4');
+            // se envia un json personalizado al usuario (boton, carrusel,etc)
 
             var messageData = {
                 recipient: {
@@ -687,7 +333,6 @@ function handleMessage(message, sender) {
                 message: message.payload.facebook
 
             };
-            console.log('Enviando al usuario messageData: ', message.payload.facebook);
             callSendAPI(messageData);
 
             break;
@@ -696,7 +341,7 @@ function handleMessage(message, sender) {
 
 
 function handleCardMessages(messages, sender) {
-
+    // gestor de cards (tarjetas para el usuario)
     let elements = [];
     for (var m = 0; m < messages.length; m++) {
         let message = messages[m];
@@ -734,6 +379,7 @@ function handleCardMessages(messages, sender) {
 
 
 function handleApiAiResponse(sender, response) {
+    // gestor de la respuesta que envia dialogflow al backend
     let responseText = response.result.fulfillment.speech;
     let responseData = response.result.fulfillment.data;
     let messages = response.result.fulfillment.messages;
@@ -780,9 +426,9 @@ function handleApiAiResponse(sender, response) {
     } else if (responseText == '' && !isDefined(action)) {
         //api ai could not evaluate input.
         console.log('Unknown query ' + response.result.resolvedQuery);
-        sendTextMessage(sender, "I'm not sure what you want. Can you be more specific? esto es fallback de api.ai");
+        sendTextMessage(sender, "sto es fallback de dialogFlow cuando no se empareja ningun intent (esta dentro del codigo o puede ser declarado en dialogflow mismo)");
     } else if (isDefined(action)) {
-        console.log('El response text del action es : ', responseText);
+        // si es que el intent emparejado contiene un action, se ejecuta esto
         handleApiAiAction(sender, action, responseText, contexts, parameters);
     } else if (isDefined(responseData) && isDefined(responseData.facebook)) {
         try {
@@ -800,8 +446,8 @@ function handleApiAiResponse(sender, response) {
 }
 
 function sendToApiAi(sender, text) {
-    console.log("sendToApiAi: " + text);
-    sendTypingOn(sender);
+    // se enviara el mensaje del usuario a dialogflow
+    sendTypingOn(sender); // simula que el chatbot esta escribiendo
     let apiaiRequest = apiAiService.textRequest(text, {
         sessionId: sessionIds.get(sender)
     });
@@ -820,7 +466,7 @@ function sendToApiAi(sender, text) {
 
 
 function sendTextMessage(recipientId, text) {
-    console.log('se activo sendTextMessage');
+    // mensaje luego que paso por dialogflow y el backend, para ser enviado al usuario
     //console.log('El mensaje para el usuario es: ',text);
     var messageData = {
         recipient: {
@@ -830,8 +476,7 @@ function sendTextMessage(recipientId, text) {
             text: text
         }
     }
-    console.log('El mensaje para el usuario es: ', messageData);
-    callSendAPI(messageData);
+    callSendAPI(messageData); // se manda a la api de facebook
 }
 
 /*
@@ -839,6 +484,7 @@ function sendTextMessage(recipientId, text) {
  *
  */
 function sendImageMessage(recipientId, imageUrl) {
+    // se envia una imagen como respuesta al usuario
     var messageData = {
         recipient: {
             id: recipientId
@@ -861,6 +507,7 @@ function sendImageMessage(recipientId, imageUrl) {
  *
  */
 function sendGifMessage(recipientId) {
+    // se envia un gift como respuesta al usuario
     var messageData = {
         recipient: {
             id: recipientId
@@ -883,6 +530,7 @@ function sendGifMessage(recipientId) {
  *
  */
 function sendAudioMessage(recipientId) {
+    // se envia un mensaje de audio al usuario como respuesta
     var messageData = {
         recipient: {
             id: recipientId
@@ -1140,6 +788,7 @@ function greetUserText(callback, userId) {
  *
  */
 function callSendAPI(messageData) {
+    // se hace uso de la API de facebook para enviar la respuesta al usuario
     //messageData.text=messageData.text.replace(/\\n/,'\n');
     request({
         uri: 'https://graph.facebook.com/v2.6/me/messages',
@@ -1169,23 +818,6 @@ function callSendAPI(messageData) {
     });
 }
 
-function suscribirseEventosUJCM(userId) {
-    let responceText = "Puedo envitarte noticias sobre los últimos eventos de la UJCM Filial Tacna :D " +
-        "¿Qué tan seguido te gustaría recibir esas noticias?";
-    let replies = [{
-            "content_type": "text",
-            "title": "Una vez a la semana",
-            "payload": "EVENTOS_UNO_X_SEMANA"
-        },
-        {
-            "content_type": "text",
-            "title": "Una vez por dia",
-            "payload": "EVENTOS_UNO_X_DIA"
-        }
-    ];
-
-    sendQuickReply(userId, responceText, replies);
-}
 
 /*
  * Postback Event
@@ -1195,6 +827,12 @@ function suscribirseEventosUJCM(userId) {
  * 
  */
 function receivedPostback(event) {
+    // Esta funcion es de las mas importantes
+    //gestiona los carruseles, botones, botones de menu permanente, emptyCells: 
+    //lo descrito arriba son formados con objetos json, y contienen un payload
+    //el payload es lo que debera colocarse dentro del switch que sigue a continuacion
+    //para luego hacer llamado a dialogflow, enviando un mensaje personalizado
+    //con el que se este 100% seguro que sera emparejado con el intent deseado
     var senderID = event.sender.id;
     var recipientID = event.recipient.id;
     var timeOfPostback = event.timestamp;
@@ -1205,24 +843,11 @@ function receivedPostback(event) {
     var payload = event.postback.payload;
 
     switch (payload) {
-        //case 'EVENTOS_UJCM':
-        //	suscribirseEventosUJCM(senderID);
-
-        //	break;
-        //persistent menu
         case 'options_payload':
             sendToApiAi(senderID, "Ver Opciones");
             break;
         case '<GET_STARTED_PAYLOAD>':
-            console.log('Se entro a GET_STARTED fuera de callback: ', senderID);
-            // greetUserText(function(userID){
-            // 	console.log('Se entro a GET_STARTED: ',senderID);
-            // 	console.log('Se entro a GET_STARTED user ID: ',userID);
-            // 	sendToApiAi(userID,"Empezar");
-            // 	setTimeout()
-            // },senderID);
             sendToApiAi(senderID, "Empezar");
-
             break;
             //Menu de Acciones Principales
             //Information
@@ -1440,14 +1065,13 @@ function verifyRequestSignature(req, res, buf) {
 }
 
 function sendEmail(topic, body) {
-
+    // opcional usando sengrid, hacer que el chatbot envie un correo al usuario
     let helper = require('sendgrid').mail;
     let from_email = new helper.Email('vj.jimenez96@gmail.com');
     let to_email = new helper.Email('vj.jimenez96@gmail.com');
     let subject = topic;
     let content = new helper.Content('text/html', body);
     let mail = new helper.Mail(from_email, subject, to_email, content);
-    console.log('Esto funciona de maravilla 3: ', subject);
     let sg = require('sendgrid')(config.SENDGRID_API_KEY);
     let request = sg.emptyRequest({
         method: 'POST',

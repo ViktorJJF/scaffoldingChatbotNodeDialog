@@ -1,10 +1,11 @@
 'use strict';
+// Este archivo es una forma generalizada de usar las funciones del chatbot en otros archivos
 const request = require('request');
 const crypto = require('crypto');
 const config = require('../config');
 module.exports = {
 
-    handleMessageAttachments: function(messageAttachments, senderID){
+    handleMessageAttachments: function(messageAttachments, senderID) {
         let self = module.exports;
         //for now just reply messageAttachments[0].payload.url
         self.sendTextMessage(senderID, "Attachment received. Thank you.");
@@ -26,8 +27,7 @@ module.exports = {
             case 2: //quick replies
                 let replies = [];
                 for (var b = 0; b < message.replies.length; b++) {
-                    let reply =
-                    {
+                    let reply = {
                         "content_type": "text",
                         "title": message.replies[b],
                         "payload": message.replies[b]
@@ -83,7 +83,7 @@ module.exports = {
 
             let element = {
                 "title": message.title,
-                "image_url":message.imageUrl,
+                "image_url": message.imageUrl,
                 "subtitle": message.subtitle,
                 "buttons": buttons
             };
@@ -149,7 +149,7 @@ module.exports = {
         var sequenceNumber = delivery.seq;
 
         if (messageIDs) {
-            messageIDs.forEach(function (messageID) {
+            messageIDs.forEach(function(messageID) {
                 console.log("Received delivery confirmation for message ID: %s",
                     messageID);
             });
@@ -231,7 +231,7 @@ module.exports = {
      *
      */
     sendReceiptMessage: function(recipientId, recipient_name, currency, payment_method,
-            timestamp, elements, address, summary, adjustments) {
+        timestamp, elements, address, summary, adjustments) {
         let self = module.exports;
         // Generate a random receipt ID as the API requires a unique ID
         var receiptId = "order" + Math.floor(Math.random() * 1000);
@@ -274,7 +274,7 @@ module.exports = {
             },
             message: {
                 text: text,
-                metadata: self.isDefined(metadata)?metadata:'',
+                metadata: self.isDefined(metadata) ? metadata : '',
                 quick_replies: replies
             }
         };
@@ -501,7 +501,7 @@ module.exports = {
      * Send a message with the account linking call-to-action
      *
      */
-     sendAccountLinking: function(recipientId) {
+    sendAccountLinking: function(recipientId) {
         var messageData = {
             recipient: {
                 id: recipientId
@@ -552,7 +552,7 @@ module.exports = {
             method: 'POST',
             json: messageData
 
-        }, function (error, response, body) {
+        }, function(error, response, body) {
             if (!error && response.statusCode == 200) {
                 var recipientId = body.recipient_id;
                 var messageId = body.message_id;
