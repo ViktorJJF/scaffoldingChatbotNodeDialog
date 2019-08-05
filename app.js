@@ -9,6 +9,7 @@ const pg = require('pg');
 const app = express();
 const uuid = require('uuid');
 const userService = require('./database/user');
+const moviesService = require('./database/movies')
 const passport = require('passport');
 // const FacebookStrategy = require('passport-facebook').Strategy;
 const session = require('express-session');
@@ -286,11 +287,26 @@ function handleApiAiAction(sender, action, responseText, contexts, parameters) {
     //     console.log('Se activo sendTextMessage case default de handleAction');
     // sendTextMessage(sender, responseText);
     switch (action) {
+        case 'consulta-movies':
+            if (!isDefined(contexts[0]) || contexts[0].name != 'consulta-movies_dialog_params_requisitos') { // esto se hace para todos los casos del switch
+                console.log(`Palabra mandada: ${responseText}`);
+                moviesService.getMovie((movie) => {
+                    console.log("la pelicula que llego de la bd: ", movie);
+                    if (!movie) {
+                        sendTextMessage(sender, 'No encontré información sobre esa pelicula'); //Por si no se encontro en la BD			
+                    } else {
+                        let reply = [];
+                        reply[0] = 'Estos son los requisitos que encontré' + movie[0]
+                    }
+                    sendTextMessage(sender, reply[0]);
+                }, responseText)
+            }
+            break;
         default:
-        //unhandled action, just send back the text
+            //unhandled action, just send back the text
             console.log('Se activo sendTextMessage case default de handleAction');
-        sendTextMessage(sender, responseText);
-        break;
+            sendTextMessage(sender, responseText);
+            break;
     }
 
 }
