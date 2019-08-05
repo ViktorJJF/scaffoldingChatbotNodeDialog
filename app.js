@@ -10,8 +10,10 @@ const app = express();
 const uuid = require('uuid');
 const userService = require('./database/user');
 const passport = require('passport');
-const FacebookStrategy = require('passport-facebook').Strategy;
+// const FacebookStrategy = require('passport-facebook').Strategy;
 const session = require('express-session');
+const broadcast = require('./routes/broadcast');
+const webviews = require('./routes/webviews');
 
 
 pg.defaults.ssl = true;
@@ -99,6 +101,8 @@ passport.deserializeUser(function(profile, cb) {
 app.set('view engine', 'ejs');
 
 
+app.use('/', broadcast);
+app.use('/webviews', webviews);
 // Index route
 app.get('/', function(req, res) {
     res.send('Hola! este espacio será para el dashboard del chatbot')
@@ -830,15 +834,15 @@ function receivedPostback(event) {
     var payload = event.postback.payload;
 
     switch (payload) {
-        // quick replay response
-        case 'si_payload':
-            sendToApiAi(senderID, "si_quick");
+        case 'options_payload':
+            sendToApiAi(senderID, "Ver Opciones");
             break;
         case '<GET_STARTED_PAYLOAD>':
             sendToApiAi(senderID, "Empezar");
             break;
             //Menu de Acciones Principales
             //Information
+
 
 
         default:
