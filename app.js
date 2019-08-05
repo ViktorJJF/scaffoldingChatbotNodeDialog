@@ -12,8 +12,6 @@ const userService = require('./database/user');
 const passport = require('passport');
 const FacebookStrategy = require('passport-facebook').Strategy;
 const session = require('express-session');
-const broadcast = require('./routes/broadcast');
-const webviews = require('./routes/webviews');
 
 
 pg.defaults.ssl = true;
