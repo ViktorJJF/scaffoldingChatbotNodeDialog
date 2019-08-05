@@ -1,7 +1,7 @@
 module.exports = {
     FB_PAGE_TOKEN: 'EAAfIgqugty0BAKMrgtUZAVLYTDAGlboyLrfulciWsYev9PZC2EMiu2xABCfmONBhTQzWKhbqWZBwFEWC4k4QiryOGiaQWV9aCo7DBV0Hn2hLeEY9mQ77byBEzMWnvtAcfUd5IU2u7zHuPxOboyrP0xKJ3qxaOZCAfoNpcr2gmjERYjyCzqTr',
     FB_VERIFY_TOKEN: 'cmactacnatoken',
-    API_AI_CLIENT_ACCESS_TOKEN: '2860c18e5f304447b32f3e4659a8bc6a',
+    API_AI_CLIENT_ACCESS_TOKEN: 'ad73fb7e8b3042fb9097b7e82e7928f2',
     FB_APP_SECRET: 'edace8cf58863932b7f100f8380c5c1c',
     FB_APP_ID: '2190788387714861',
     SERVER_URL: 'https://charlybotheroku.herokuapp.com/',
