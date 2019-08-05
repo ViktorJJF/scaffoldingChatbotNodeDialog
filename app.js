@@ -189,7 +189,7 @@ function setSessionAndUser(senderID) {
 }
 
 function receivedMessage(event) {
-
+    console.log("se recibio el mensaje: ", event.message);
 
 
     var senderID = event.sender.id;
