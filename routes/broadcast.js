@@ -1,10 +1,10 @@
 const config = require('../config');
 const express = require('express');
-const userService = require('../user');
-const requisitos = require('../requisitosTramites');
+const userService = require('../database/user');
+const requisitos = require('../database/requisitosTramites');
 const router = express.Router();
 const fbService = require('../fb-service/fb-service');
-const queries_user_estudiante = require('../queries_user_estudiante');
+const queries_user_estudiante = require('../database/queries_user_estudiante');
 
 
 

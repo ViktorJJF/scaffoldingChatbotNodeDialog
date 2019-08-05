@@ -8,8 +8,8 @@ const request = require('request');
 const pg = require('pg');
 const app = express();
 const uuid = require('uuid');
-const userService = require('./user');
-const requisitos = require('./requisitosTramites');
+const userService = require('./database/user');
+const requisitos = require('./database/requisitosTramites');
 const passport = require('passport');
 const FacebookStrategy = require('passport-facebook').Strategy;
 const session = require('express-session');
@@ -50,16 +50,8 @@ if (!config.PG_CONFIG) { //postgresql config object
     throw new Error('missing PG_CONFIG');
 }
 
-//================================================================
-//====================VIKTOR-UJCM=======================
-//================================================================
 
-//Keep bot awake
-// const https = require("https");
-// setInterval(function() {
-//     https.get("https://smart-ujcm.herokuapp.com");
-//     console.log('Keeping viktor UJCM awake');
-// }, 300000); // every 5 minutes (300000)
+
 
 
 app.set('port', (process.env.PORT || 5000))
@@ -843,91 +835,15 @@ function receivedPostback(event) {
     var payload = event.postback.payload;
 
     switch (payload) {
-        case 'options_payload':
-            sendToApiAi(senderID, "Ver Opciones");
+        // quick replay response
+        case 'si_payload':
+            sendToApiAi(senderID, "si_quick");
             break;
         case '<GET_STARTED_PAYLOAD>':
             sendToApiAi(senderID, "Empezar");
             break;
             //Menu de Acciones Principales
             //Information
-        case 'schedule_payload':
-            sendToApiAi(senderID, 'schedule_payload');
-            break;
-        case 'address_payload':
-            sendToApiAi(senderID, 'Direcciones');
-            break;
-        case 'telephone_payload':
-            sendToApiAi(senderID, 'numero de telefono');
-            break;
-            //Procedures
-        case 'manual_procedimientos_pre_payload':
-            sendToApiAi(senderID, 'manual_procedimientos_pre_payload');
-            break;
-        case 'seguimiento_tramites_pre_payload':
-            sendToApiAi(senderID, 'seguimiento_tramites_pre_payload');
-            break;
-        case 'requisitos_tramites_pre_payload':
-            sendToApiAi(senderID, 'requisitos_tramites_pre_payload');
-            break;
-
-            //admissions
-        case 'postular_admision__payload':
-            sendToApiAi(senderID, 'postular_admision__payload');
-            break;
-        case 'fechas_admision_payload':
-            sendToApiAi(senderID, 'fechas_admision_payload');
-            break;
-        case 'carreras_admision_payload':
-            sendToApiAi(senderID, 'carreras_admision_payload');
-            break;
-
-
-            ///////////////////////////////////////////////////////////////////////////////////////
-
-            //Parte de Admision
-        case 'paso1_pre_payload':
-            sendToApiAi(senderID, 'paso1_pre_payload');
-            break;
-
-        case 'paso2_pre_payload':
-            sendToApiAi(senderID, 'paso2_pre_payload');
-            break;
-
-        case 'paso3_pre_payload':
-            sendToApiAi(senderID, 'paso3_pre_payload');
-            break;
-
-        case 'paso4_pre_payload':
-            sendToApiAi(senderID, 'paso4_pre_payload');
-            break;
-
-        case 'ver_mas_pre_payload':
-            sendToApiAi(senderID, 'ver_mas_pre_payload');
-            break;
-            //Horarios de clases
-
-        case 'horario_derecho_payload':
-            sendToApiAi(senderID, 'horario_derecho_payload');
-            break;
-        case 'horario_contabilidad_payload':
-            sendToApiAi(senderID, 'horario_contabilidad_payload');
-            break;
-        case 'mas_horarios_payload':
-            sendToApiAi(senderID, 'mas_horarios_payload');
-            break;
-
-            //Investigacion
-        case 'proceso_bach_titulo_payload':
-            sendToApiAi(senderID, 'proceso_bach_titulo_payload');
-            break;
-        case 'indice_formato_pregrado_payload':
-            sendToApiAi(senderID, 'indice_formato_pregrado_payload');
-            break;
-        case 'manual_grados_titulos_payload':
-            sendToApiAi(senderID, 'manual_grados_titulos_payload');
-            break;
-
 
 
         default:

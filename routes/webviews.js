@@ -3,8 +3,10 @@
 const config = require('../config');
 const express = require('express');
 const fbservice = require('../fb-service/fb-service');
-const queries_user_estudiante = require('../queries_user_estudiante');
-const { getUserName } = require('../utilities/utilities');
+const queries_user_estudiante = require('../database/queries_user_estudiante');
+const {
+    getUserName
+} = require('../utilities/utilities');
 
 const router = express.Router();
 
