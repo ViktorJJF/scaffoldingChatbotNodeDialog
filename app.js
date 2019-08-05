@@ -101,8 +101,6 @@ passport.deserializeUser(function(profile, cb) {
 app.set('view engine', 'ejs');
 
 
-app.use('/', broadcast);
-app.use('/webviews', webviews);
 // Index route
 app.get('/', function(req, res) {
     res.send('Hola! este espacio será para el dashboard del chatbot')
