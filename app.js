@@ -285,6 +285,13 @@ function handleApiAiAction(sender, action, responseText, contexts, parameters) {
     // //unhandled action, just send back the text
     //     console.log('Se activo sendTextMessage case default de handleAction');
     // sendTextMessage(sender, responseText);
+    switch (action) {
+        default:
+        //unhandled action, just send back the text
+            console.log('Se activo sendTextMessage case default de handleAction');
+        sendTextMessage(sender, responseText);
+        break;
+    }
 
 }
 
@@ -415,9 +422,9 @@ function handleApiAiResponse(sender, response) {
     } else if (responseText == '' && !isDefined(action)) {
         //api ai could not evaluate input.
         console.log('Unknown query ' + response.result.resolvedQuery);
-        sendTextMessage(sender, "sto es fallback de dialogFlow cuando no se empareja ningun intent (esta dentro del codigo o puede ser declarado en dialogflow mismo)");
+        sendTextMessage(sender, "I'm not sure what you want. Can you be more specific? esto es fallback de api.ai");
     } else if (isDefined(action)) {
-        // si es que el intent emparejado contiene un action, se ejecuta esto
+        console.log('El response text del action es : ', responseText);
         handleApiAiAction(sender, action, responseText, contexts, parameters);
     } else if (isDefined(responseData) && isDefined(responseData.facebook)) {
         try {
