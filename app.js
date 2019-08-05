@@ -297,8 +297,8 @@ function handleApiAiAction(sender, action, responseText, contexts, parameters) {
                     } else {
                         let reply = [];
                         reply[0] = 'Estos son los requisitos que encontré' + movie[0]
+                        sendTextMessage(sender, reply[0]);
                     }
-                    sendTextMessage(sender, reply[0]);
                 }, responseText)
             }
             break;
