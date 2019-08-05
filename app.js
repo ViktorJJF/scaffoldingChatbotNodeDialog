@@ -296,7 +296,7 @@ function handleApiAiAction(sender, action, responseText, contexts, parameters) {
                         sendTextMessage(sender, 'No encontré información sobre esa pelicula'); //Por si no se encontro en la BD			
                     } else {
                         let reply = [];
-                        reply[0] = 'Estos son los requisitos que encontré' + movie[0]
+                        reply[0] = 'Esta es la descripcion que encontre en la bd: ' + movie[0].description;
                         sendTextMessage(sender, reply[0]);
                     }
                 }, responseText)
